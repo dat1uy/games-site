@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Game Portal</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar">
+        <div class="brand">Game Portal</div>
+        <nav class="nav-links">
+          <a href="/">Home</a>
+          <a href="/game/eaglercraft">Eaglercraft</a>
+        </nav>
+      </header>
+
+      <main class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">HTML Games</p>
+          <h1>Your games in one place</h1>
+          <p class="subtitle">
+            Upload or extract a game ZIP into the repo, then open it from this portal.
+          </p>
+          <div class="actions">
+            <a class="primary" href="/game/eaglercraft">Open Eaglercraft</a>
+            <a class="secondary" href="/games">Browse Games Folder</a>
+          </div>
+        </div>
+      </main>
+
+      <section class="games-grid">
+        <article class="game-card featured">
+          <div class="card-top">
+            <span class="badge">Featured</span>
+            <span class="status online">Ready</span>
+          </div>
+          <h2>Eaglercraft</h2>
+          <p>Upload your Eaglercraft build files into <code>public/games/eaglercraft/</code> or upload a ZIP file and it will extract automatically.</p>
+          <a href="/game/eaglercraft">Launch Game</a>
+        </article>
+
+        <article class="game-card">
+          <div class="card-top">
+            <span class="badge">Custom</span>
+            <span class="status pending">Add Game</span>
+          </div>
+          <h2>Any HTML Game</h2>
+          <p>Put a folder in <code>public/games/yourgame/</code> with an <code>index.html</code> file and it will show up as a playable game.</p>
+          <a href="/games">Open Folder</a>
+        </article>
+      </section>
+    </div>
+  </body>
+</html>

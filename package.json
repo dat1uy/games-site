@@ -1,0 +1,13 @@
+{
+  "name": "games-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Game portal that can host HTML game builds and auto-extract ZIP game files.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "unzipper": "^3.1.3"
+  }
+}
