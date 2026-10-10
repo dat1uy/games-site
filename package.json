@@ -1,0 +1,25 @@
+{
+  "name": "secure-proxy",
+  "version": "1.0.0",
+  "description": "A fast, simple, and secure HTTP/HTTPS proxy in Node.js",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [
+    "proxy",
+    "http",
+    "https",
+    "security",
+    "forward-proxy"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "http-proxy": "^1.18.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
