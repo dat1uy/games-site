@@ -12,7 +12,7 @@
         <div class="brand">Game Portal</div>
         <nav class="nav-links">
           <a href="/">Home</a>
-          <a href="/game/eaglercraft">Eaglercraft</a>
+          <a href="/games">Games</a>
         </nav>
       </header>
 
@@ -21,11 +21,11 @@
           <p class="eyebrow">HTML Games</p>
           <h1>Your games in one place</h1>
           <p class="subtitle">
-            Upload or extract a game ZIP into the repo, then open it from this portal.
+            Put your game folder in <code>public/games/</code> or upload a ZIP file there and it will auto-extract.
           </p>
           <div class="actions">
-            <a class="primary" href="/game/eaglercraft">Open Eaglercraft</a>
-            <a class="secondary" href="/games">Browse Games Folder</a>
+            <a class="primary" href="/games">Browse Games</a>
+            <a class="secondary" href="/game/eaglercraft">Try Eaglercraft</a>
           </div>
         </div>
       </main>
@@ -37,18 +37,18 @@
             <span class="status online">Ready</span>
           </div>
           <h2>Eaglercraft</h2>
-          <p>Upload your Eaglercraft build files into <code>public/games/eaglercraft/</code> or upload a ZIP file and it will extract automatically.</p>
+          <p>Place the full Eaglercraft build in <code>public/games/eaglercraft/</code> or upload <code>public/games/eaglercraft.zip</code>.</p>
           <a href="/game/eaglercraft">Launch Game</a>
         </article>
 
         <article class="game-card">
           <div class="card-top">
             <span class="badge">Custom</span>
-            <span class="status pending">Add Game</span>
+            <span class="status pending">Any Game</span>
           </div>
-          <h2>Any HTML Game</h2>
-          <p>Put a folder in <code>public/games/yourgame/</code> with an <code>index.html</code> file and it will show up as a playable game.</p>
-          <a href="/games">Open Folder</a>
+          <h2>HTML Game Folder</h2>
+          <p>Use the format <code>public/games/mygame/index.html</code> and it will work from <code>/game/mygame</code>.</p>
+          <a href="/games">Open Library</a>
         </article>
       </section>
     </div>

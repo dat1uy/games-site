@@ -24,6 +24,9 @@ const MIME_TYPES = {
   '.mp4': 'video/mp4',
   '.webm': 'video/webm',
   '.zip': 'application/zip',
+  '.woff': 'font/woff',
+  '.woff2': 'font/woff2',
+  '.ttf': 'font/ttf',
 };
 
 function ensureDir(dirPath) {
@@ -32,45 +35,39 @@ function ensureDir(dirPath) {
   }
 }
 
-async function extractZipIfNeeded(zipPath) {
-  const zipName = path.basename(zipPath, '.zip');
-  const targetDir = path.join(gamesDir, zipName);
+async function extractZip(zipPath, targetDir) {
+  ensureDir(targetDir);
 
-  if (fs.existsSync(targetDir)) {
-    return;
-  }
-
-  ensureDir(gamesDir);
-
-  const zipStream = fs.createReadStream(zipPath);
   const zip = await unzipper.Open.file(zipPath);
+  for (const file of zip.files) {
+    if (file.type === 'Directory') continue;
 
-  await Promise.all(
-    zip.files.map(async (entry) => {
-      if (entry.type === 'Directory') return;
+    const relativePath = file.path;
+    const destPath = path.join(targetDir, relativePath);
+    const parentDir = path.dirname(destPath);
+    ensureDir(parentDir);
 
-      const destPath = path.join(gamesDir, zipName, entry.path);
-      const destDir = path.dirname(destPath);
-      ensureDir(destDir);
-
-      const fileStream = entry.stream();
-      const chunks = [];
-      for await (const chunk of fileStream) {
-        chunks.push(chunk);
-      }
-      fs.writeFileSync(destPath, Buffer.concat(chunks));
-    })
-  );
+    const content = await file.buffer();
+    fs.writeFileSync(destPath, content);
+  }
 }
 
-async function prepareGameFolders() {
+async function scanGamesDir() {
   ensureDir(gamesDir);
+  const items = fs.readdirSync(gamesDir, { withFileTypes: true });
 
-  const files = fs.readdirSync(process.cwd());
-  for (const file of files) {
-    if (file.toLowerCase().endsWith('.zip')) {
-      const zipPath = path.join(process.cwd(), file);
-      await extractZipIfNeeded(zipPath);
+  for (const item of items) {
+    if (!item.isFile()) continue;
+
+    const lower = item.name.toLowerCase();
+    if (!lower.endsWith('.zip')) continue;
+
+    const zipPath = path.join(gamesDir, item.name);
+    const targetName = item.name.replace(/\.zip$/i, '');
+    const targetDir = path.join(gamesDir, targetName);
+
+    if (!fs.existsSync(targetDir)) {
+      await extractZip(zipPath, targetDir);
     }
   }
 }
@@ -100,29 +97,56 @@ const server = http.createServer((req, res) => {
   }
 
   if (pathname.startsWith('/game/')) {
-    const part = pathname.replace(/^\/game\//, '').replace(/\/+$/, '');
-    const gameIndex = path.join(gamesDir, part, 'index.html');
+    const slug = pathname.replace(/^\/game\//, '').replace(/\/+$/, '');
+    const gameDir = path.join(gamesDir, slug);
+    const gameIndex = path.join(gameDir, 'index.html');
 
     fs.stat(gameIndex, (err) => {
       if (err) {
-        const gameHint = `
+        const msg = `
           <html>
             <body style="font-family:Arial; background:#0d1321; color:#fff; display:grid; place-items:center; height:100vh; margin:0;">
               <div style="max-width:700px; text-align:center;">
-                <h1 style="color:#7dd3fc;">Game not uploaded yet</h1>
-                <p>Put your HTML game in <strong>public/games/${part}/index.html</strong></p>
-                <p>Or upload a ZIP file named <strong>${part}.zip</strong> and it will extract automatically.</p>
+                <h1 style="color:#7dd3fc;">Game not found</h1>
+                <p>Put the game in <strong>public/games/${slug}/index.html</strong></p>
+                <p>or upload a ZIP called <strong>${slug}.zip</strong> inside <strong>public/games/</strong>.</p>
               </div>
             </body>
           </html>
         `;
         res.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });
-        res.end(gameHint);
+        res.end(msg);
         return;
       }
 
       sendFile(res, gameIndex);
     });
+    return;
+  }
+
+  if (pathname === '/games') {
+    let list = '';
+    const names = fs.existsSync(gamesDir) ? fs.readdirSync(gamesDir) : [];
+    const gameLinks = names
+      .filter((name) => fs.existsSync(path.join(gamesDir, name, 'index.html')) || name.toLowerCase().endsWith('.zip'))
+      .map((name) => {
+        const cleanName = name.replace(/\.zip$/i, '');
+        return `<li><a href="/game/${encodeURIComponent(cleanName)}">${cleanName}</a></li>`;
+      })
+      .join('');
+
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.end(`
+      <html>
+        <head><title>Games</title></head>
+        <body style="font-family:Arial; background:#0d1321; color:#fff; padding:40px;">
+          <h1>Available Games</h1>
+          <ul>
+            ${gameLinks || '<li>No games uploaded yet.</li>'}
+          </ul>
+        </body>
+      </html>
+    `);
     return;
   }
 
@@ -147,9 +171,10 @@ const server = http.createServer((req, res) => {
 (async () => {
   try {
     ensureDir(gamesDir);
-    await prepareGameFolders();
+    await scanGamesDir();
     server.listen(PORT, () => {
       console.log(`Game portal running on port ${PORT}`);
+      console.log(`Games directory: ${gamesDir}`);
     });
   } catch (error) {
     console.error('Failed to start game portal:', error);

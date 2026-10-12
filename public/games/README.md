@@ -9,16 +9,16 @@ public/games/
     index.html
     assets/
 
-Or upload a ZIP file such as:
+Or upload a ZIP file named:
 
-public/games/mygame.zip
+public/games/eaglercraft.zip
 
 The server will extract it into:
 
-public/games/mygame/
+public/games/eaglercraft/
 
-Then you can open:
+Then open:
 
-/game/mygame
+/game/eaglercraft
 
-Do not forget the main file should be named `index.html`.
+Important: the game must contain a full `index.html` plus required assets.
